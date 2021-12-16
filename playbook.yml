@@ -1,0 +1,36 @@
+- hosts: serverku
+  vars:
+    - image: brurysulandra/nginx-docker
+  tasks:
+          - name: install python-docker di ubuntu
+            apt:
+              name:
+                - python3
+                - python3-docker
+              state: present
+            when: ansible_distribution == "Ubuntu"
+
+          - name: install python-docker di centos
+            yum:
+              name:
+                - python3
+                - python3-docker
+              state: present
+            when: ansible_distribution == "CentOS"
+
+          - name: pull image docker
+            docker_image:
+              name: "{{ image }}"
+              state: present
+              force: yes
+
+          - name: create containers
+            docker_container:
+              name: docker-ansible
+              image: "{{ image }}"
+              state: started
+              published_ports:
+              - 10000:80
+              recreate: yes
+
+
